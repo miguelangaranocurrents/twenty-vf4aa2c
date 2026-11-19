@@ -78,8 +78,10 @@ export const TextInput = ({
   const wrapperRef = useRef<HTMLInputElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
 
+  // The input keeps the raw text while typing: trimming on every keystroke
+  // makes mid-string spaces impossible to type. Only reported values are trimmed.
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setInternalText(getValue(event.target.value, shouldTrim));
+    setInternalText(event.target.value);
     onChange?.(getValue(event.target.value, shouldTrim));
   };
   useEffect(() => {
@@ -90,7 +92,7 @@ export const TextInput = ({
     focusId: instanceId,
     inputRef: wrapperRef,
     copyRef: copyRef,
-    inputValue: internalText,
+    inputValue: getValue(internalText, shouldTrim),
     onEnter,
     onEscape,
     onClickOutside,

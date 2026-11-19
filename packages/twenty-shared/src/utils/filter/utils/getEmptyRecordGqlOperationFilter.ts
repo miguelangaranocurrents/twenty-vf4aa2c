@@ -133,17 +133,23 @@ export const getEmptyRecordGqlOperationFilter = ({
       }
       break;
     }
-    case 'CURRENCY':
+    case 'CURRENCY': {
+      // The emptiness target is the selected sub-field: "currency is empty"
+      // must not look at the amount column.
+      const emptyCurrencySubFieldFilter: CurrencyFilter =
+        compositeFieldName === 'currencyCode'
+          ? { currencyCode: { is: 'NULL' } }
+          : { amountMicros: { is: 'NULL' } };
+
       emptyRecordFilter = {
         or: [
           {
-            [correspondingField.name]: {
-              amountMicros: { is: 'NULL' },
-            } as CurrencyFilter,
+            [correspondingField.name]: emptyCurrencySubFieldFilter,
           },
         ],
       };
       break;
+    }
     case 'FULL_NAME': {
       if (!isSubFieldFilter) {
         const fullNameFilters = generateILikeFiltersForCompositeFields(
